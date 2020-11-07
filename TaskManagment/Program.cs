@@ -116,6 +116,7 @@ namespace TaskManagment
 
         public void ShowTitle()
         {
+            Console.Clear();
             Console.WriteLine("{0,3}{1,15}{2,14}", "Id", "Title", "Status");
         }
 
@@ -219,7 +220,6 @@ namespace TaskManagment
                         break;
 
                     case "/all":
-                        Console.Clear();
                         List<Task> tasks = Tmanager.AllTasks();
                         Tmanager.ShowTitle();
                         foreach (Task task in tasks)
