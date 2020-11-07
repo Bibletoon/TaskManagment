@@ -68,7 +68,7 @@ namespace TaskManagment
             using StreamWriter outputFile = new StreamWriter(filename);
             foreach (Task task in Tasks)
             {
-                outputFile.WriteLine($"{task.Status}{task.Title}");
+                outputFile.WriteLine($"{(int)task.Status}{task.Title}");
             }
         }
 
