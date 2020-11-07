@@ -31,7 +31,6 @@ namespace TaskManagment
                         {
                             Console.WriteLine(task.ToString());
                         }
-                        Console.WriteLine();
                         break;
                     case "/completed":
                         List<Task> completed = Tmanager.CompletedTasks();

@@ -49,14 +49,16 @@ namespace TaskManagment
             while (sqlReader.Read())
             {
                 result.Add(new Task((long)sqlReader["ID"], (string)sqlReader["Title"],
-                    Int32.Parse(sqlReader["Status"].ToString())));
+                    Int32.Parse(sqlReader["Status"].ToString()) == 0 ? StatusCode.Uncomplited : StatusCode.Complited));
+
+                
             }
 
             Connection.Close();
             return result;
         }
 
-        public long WriteTask(string title, int status)
+        public long WriteTask(string title, StatusCode status)
         {
             string writeQuery = "INSERT INTO Tasks (ID,Title,Status) VALUES (NULL,@TITLE,@STATUS);";
             SQLiteCommand writeCommand = new SQLiteCommand(writeQuery, Connection);

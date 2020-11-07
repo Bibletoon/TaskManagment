@@ -4,13 +4,19 @@ using System.Text;
 
 namespace TaskManagment
 {
+    enum StatusCode
+    {
+        Uncomplited,
+        Complited
+    }
+
     class Task
     {
         public long Id;
         public string Title;
-        public int Status;
+        public StatusCode Status;
 
-        public Task(long id, string title, int status)
+        public Task(long id, string title, StatusCode status)
         {
             Title = title;
             Id = id;

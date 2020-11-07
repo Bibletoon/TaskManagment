@@ -34,7 +34,7 @@ namespace TaskManagment
             return Tasks.FindAll(n => n.Status != 0);
         }
 
-        public void AddTask(string title, int status = 0)
+        public void AddTask(string title, StatusCode status = StatusCode.Uncomplited)
         {
             if (Tasks.Count(task => task.Title == title) != 0)
             {
@@ -50,7 +50,7 @@ namespace TaskManagment
         public void CompleteTask(long id)
         {
             var res = from task in Tasks where task.Id == id select task;
-            res.First().Status = 1;
+            res.First().Status = StatusCode.Complited;
             DataBaseManager manager = DataBaseManager.GetInstance();
             manager.CompleteTask(id);
         }
@@ -67,7 +67,7 @@ namespace TaskManagment
             StreamWriter outputFile = new StreamWriter(filename);
             foreach (Task task in Tasks)
             {
-                outputFile.WriteLine($"{task.Status % 2}{task.Title}");
+                outputFile.WriteLine($"{task.Status}{task.Title}");
             }
             outputFile.Close();
         }
@@ -78,7 +78,7 @@ namespace TaskManagment
             string taskString;
             while ((taskString = inputFile.ReadLine()) != null && taskString != "")
             {
-                int newStatus = taskString[0] - '0';
+                StatusCode newStatus = taskString[0] == '0' ? StatusCode.Uncomplited : StatusCode.Complited;
                 AddTask(taskString.Substring(1), newStatus);
             }
         }
