@@ -19,10 +19,9 @@ namespace TaskManagment
             Tasks = manager.LoadTasks();
         }
 
-        public void ShowTitle()
+        public string GetTitle()
         {
-            Console.Clear();
-            Console.WriteLine("{0,3}{1,15}{2,14}", "Id", "Title", "Status");
+            return String.Format("{0,3}{1,15}{2,14}", "Id", "Title", "Status");
         }
 
         public List<Task> AllTasks()

@@ -17,9 +17,9 @@ namespace TaskManagment
             Status = status;
         }
 
-        public void Show()
+        public override string ToString()
         {
-            Console.WriteLine("{0,3}{1,15}{2,14}", Id, Title,
+            return String.Format("{0,3}{1,15}{2,14}", Id, Title,
                 Status == 0 ? "uncompleted" : "completed");
         }
     }

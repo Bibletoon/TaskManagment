@@ -25,19 +25,21 @@ namespace TaskManagment
 
                     case "/all":
                         List<Task> tasks = Tmanager.AllTasks();
-                        Tmanager.ShowTitle();
+                        Console.Clear();
+                        Console.WriteLine(Tmanager.GetTitle());
                         foreach (Task task in tasks)
                         {
-                            task.Show();
+                            Console.WriteLine(task.ToString());
                         }
                         Console.WriteLine();
                         break;
                     case "/completed":
                         List<Task> completed = Tmanager.CompletedTasks();
-                        Tmanager.ShowTitle();
+                        Console.Clear();
+                        Console.WriteLine(Tmanager.GetTitle());
                         foreach (Task task in completed)
                         {
-                            task.Show();
+                            Console.WriteLine(task.ToString());
                         }
                         break;
                     case "/complete":
