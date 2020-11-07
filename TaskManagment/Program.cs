@@ -19,8 +19,15 @@ namespace TaskManagment
                 switch (command[0])
                 {
                     case "/add":
-                        Tmanager.AddTask(String.Join(" ", command.Skip(1)));
-                        Console.WriteLine($"Task \"{String.Join(" ", command.Skip(1))}\" added.");
+                        Task newTask = Tmanager.AddTask(String.Join(" ", command.Skip(1)));
+                        if (newTask == null)
+                        {
+                            Console.WriteLine($"Task \"{String.Join(" ", command.Skip(1))}\" not added, it's already in list.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Task \"{String.Join(" ", command.Skip(1))}\" added.");
+                        }
                         break;
 
                     case "/all":

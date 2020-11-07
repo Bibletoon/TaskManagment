@@ -34,17 +34,18 @@ namespace TaskManagment
             return Tasks.FindAll(n => n.Status != 0);
         }
 
-        public void AddTask(string title, StatusCode status = StatusCode.Uncomplited)
+        public Task AddTask(string title, StatusCode status = StatusCode.Uncomplited)
         {
             if (Tasks.Count(task => task.Title == title) != 0)
             {
-                return;
+                return null;
             }
 
             DataBaseManager manager = DataBaseManager.GetInstance();
             long id = manager.WriteTask(title, status);
             Task newTask = new Task(id, title, status);
             Tasks.Add(newTask);
+            return newTask;
         }
 
         public void CompleteTask(long id)
@@ -64,17 +65,16 @@ namespace TaskManagment
 
         public void SaveToFile(string filename)
         {
-            StreamWriter outputFile = new StreamWriter(filename);
+            using StreamWriter outputFile = new StreamWriter(filename);
             foreach (Task task in Tasks)
             {
                 outputFile.WriteLine($"{task.Status}{task.Title}");
             }
-            outputFile.Close();
         }
 
         public void LoadFromFile(string filename)
         {
-            StreamReader inputFile = new StreamReader(filename);
+            using StreamReader inputFile = new StreamReader(filename);
             string taskString;
             while ((taskString = inputFile.ReadLine()) != null && taskString != "")
             {
