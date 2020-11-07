@@ -40,16 +40,16 @@ namespace TaskManagment
             Connection.Close();
         }
 
-        public List<(long, string, int)> LoadTasks()
+        public List<Task> LoadTasks()
         {
             string loadQuery = "SELECT * FROM Tasks";
             SQLiteCommand loadCommand = new SQLiteCommand(loadQuery, Connection);
             Connection.Open();
             SQLiteDataReader sqlReader = loadCommand.ExecuteReader();
-            List<(long, string, int)> result = new List<(long, string, int)>();
+            List<Task> result = new List<Task>();
             while (sqlReader.Read())
             {
-                result.Add(((long) sqlReader["ID"], (string) sqlReader["Title"],
+                result.Add(new Task((long) sqlReader["ID"], (string) sqlReader["Title"],
                     Int32.Parse(sqlReader["Status"].ToString())));
             }
 
@@ -106,12 +106,7 @@ namespace TaskManagment
         public TaskManager()
         {
             DataBaseManager manager = DataBaseManager.GetInstance();
-            Tasks = new List<Task>();
-            foreach (var (id, title, status) in manager.LoadTasks())
-            {
-                Task newTask = new Task(id, title, status);
-                Tasks.Add(newTask);
-            }
+            Tasks = manager.LoadTasks();
         }
 
         public void ShowTitle()
