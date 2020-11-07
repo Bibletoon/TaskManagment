@@ -36,7 +36,7 @@ namespace TaskManagment
 
         public Task AddTask(string title, StatusCode status = StatusCode.Uncomplited)
         {
-            if (Tasks.Count(task => task.Title == title) != 0)
+            if (Tasks.Any(n=>n.Title==title))
             {
                 return null;
             }
