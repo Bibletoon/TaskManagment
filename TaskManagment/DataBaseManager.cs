@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using TaskManagment.Enums;
+
 
 namespace TaskManagment
 {
@@ -9,7 +13,7 @@ namespace TaskManagment
     {
         private static DataBaseManager Instance;
 
-        private SQLiteConnection Connection;
+        private DbContextOptions<ApplicationContext> options;
 
         public DataBaseManager()
         {
@@ -18,81 +22,54 @@ namespace TaskManagment
 
         public static DataBaseManager GetInstance() => Instance ?? (Instance = new DataBaseManager());
 
-        private void ConfigureConnection()
+        public void ConfigureConnection()
         {
-            if (!File.Exists(@"./Tasks.db"))
-            {
-                SQLiteConnection.CreateFile("./Tasks.db");
-            }
-
-            Connection = new SQLiteConnection("Data Source = ./Tasks.db");
-            CheckTable();
-        }
-
-        private void CheckTable()
-        {
-            string createQuery =
-                "CREATE TABLE IF NOT EXISTS Tasks (ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, Title TEXT, Status INTEGER DEFAULT 0)";
-            SQLiteCommand CreateCommand = new SQLiteCommand(createQuery, Connection);
-            Connection.Open();
-            CreateCommand.ExecuteNonQuery();
-            Connection.Close();
+            var builder = new ConfigurationBuilder();
+            builder.SetBasePath(Directory.GetCurrentDirectory());
+            builder.AddJsonFile("appsettings.json");
+            var config = builder.Build();
+            string connectionString = config.GetConnectionString("DefaultConnection");
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+            options = optionsBuilder.UseSqlite(connectionString).Options;
         }
 
         public List<Task> LoadTasks()
         {
-            string loadQuery = "SELECT * FROM Tasks";
-            SQLiteCommand loadCommand = new SQLiteCommand(loadQuery, Connection);
-            Connection.Open();
-            SQLiteDataReader sqlReader = loadCommand.ExecuteReader();
-            List<Task> result = new List<Task>();
-            while (sqlReader.Read())
+            using (ApplicationContext db = new ApplicationContext(options))
             {
-                result.Add(new Task((long)sqlReader["ID"], (string)sqlReader["Title"],
-                    Int32.Parse(sqlReader["Status"].ToString()) == 0 ? StatusCode.Uncomplited : StatusCode.Complited));
-
-                
+                return db.Tasks.ToList();
             }
-
-            Connection.Close();
-            return result;
         }
 
         public long WriteTask(string title, StatusCode status)
         {
-            string writeQuery = "INSERT INTO Tasks (ID,Title,Status) VALUES (NULL,@TITLE,@STATUS);";
-            SQLiteCommand writeCommand = new SQLiteCommand(writeQuery, Connection);
-            writeCommand.Parameters.Add(new SQLiteParameter("@TITLE", title));
-            writeCommand.Parameters.Add(new SQLiteParameter("@STATUS", status));
-            Connection.Open();
-            writeCommand.ExecuteNonQuery();
-
-            string GetQuery = "SELECT last_insert_rowid()";
-            SQLiteCommand GetCommand = new SQLiteCommand(GetQuery, Connection);
-
-            long id = (long)GetCommand.ExecuteScalar();
-            Connection.Close();
-
-            return id;
+            using (ApplicationContext db = new ApplicationContext(options))
+            {
+                var newTask = new Task(title,status);
+                db.Tasks.Add(newTask);
+                db.SaveChanges();
+                return newTask.Id;
+            }
         }
 
         public void CompleteTask(long id)
         {
-            string UpdateQuery = "UPDATE Tasks SET Status=1 WHERE id=" + id.ToString();
-            SQLiteCommand updateCommand = new SQLiteCommand(UpdateQuery, Connection);
-            Connection.Open();
-            updateCommand.ExecuteNonQuery();
-            Connection.Close();
+            using (ApplicationContext db = new ApplicationContext(options))
+            {
+                var task = db.Tasks.Find(id);
+                task.Status = StatusCode.Complited;
+                db.SaveChanges();
+            }
         }
 
         public void DeleteTask(long id)
         {
-            string deleteQuery = "DELETE FROM Tasks WHERE ID = @Id";
-            SQLiteCommand deleteCommand = new SQLiteCommand(deleteQuery, Connection);
-            deleteCommand.Parameters.Add(new SQLiteParameter("@Id", id));
-            Connection.Open();
-            deleteCommand.ExecuteNonQuery();
-            Connection.Close();
+            using (ApplicationContext db = new ApplicationContext(options))
+            {
+                var task = db.Tasks.Find(id);
+                db.Tasks.Remove(task);
+                db.SaveChanges();
+            }
         }
     }
 }

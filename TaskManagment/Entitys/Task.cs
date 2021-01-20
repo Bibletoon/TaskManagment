@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TaskManagment.Enums;
 
 namespace TaskManagment
 {
-    enum StatusCode
-    {
-        Uncomplited,
-        Complited
-    }
-
     class Task
     {
-        public long Id;
-        public string Title;
-        public StatusCode Status;
+        public long Id { get; set; }
+        public string Title { get; set; }
+        public StatusCode Status { get; set; }
 
         public Task(long id, string title, StatusCode status)
         {
             Title = title;
             Id = id;
+            Status = status;
+        }
+
+        public Task(string title, StatusCode status)
+        {
+            Title = title;
             Status = status;
         }
 
